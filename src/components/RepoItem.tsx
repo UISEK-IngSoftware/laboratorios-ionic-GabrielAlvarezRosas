@@ -1,21 +1,23 @@
 import './RepoItem.css';
 import React from 'react';
+import { Repository } from '../interfaces/Repository';
 import { pencilOutline, trash } from 'ionicons/icons';
 import { IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonThumbnail } from '@ionic/react';
 
-interface RepoProps {
-    name: string;
-    avatarUrl: string;
-}
-
-const RepoItem: React.FC<RepoProps> = ({ name, avatarUrl }) => {
+const RepoItem: React.FC<Repository> = ( repo ) => {
     return (
         <IonItemSliding>
             <IonItem>
                 <IonThumbnail slot="start">
-                    <img src={avatarUrl} alt="GitHub Logo" />
+                    <img src={repo.owner.avatar_url} alt="GitHub Logo" />
                 </IonThumbnail>
-                <IonLabel>{name}</IonLabel>
+                <IonLabel>
+                    <h3>{repo.name}</h3>
+                    {repo.description && <p>{repo.description}</p>}
+                    {repo.language && (
+                        <p><strong>Language:</strong> {repo.language}</p>
+                        )}
+                </IonLabel>
             </IonItem>
             <IonItemOptions>
                 <IonItemOption>
