@@ -1,7 +1,43 @@
 import { IonButton, IonContent, IonHeader, IonInput, IonPage, IonTextarea, IonTitle, IonToolbar } from '@ionic/react';
 import './Tab2.css';
+import { useHistory } from 'react-router-dom';
+import { RepositoryPayload } from '../interfaces/RepositoryPayload';
+import { createRepository } from '../services/GithubService';
+import React from 'react';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab2: React.FC = () => {
+  const history = useHistory();
+  const [loading, setLoading] = React.useState(false);
+
+  const repoFormData: RepositoryPayload = {
+    name: '',
+    description: '',
+  };
+
+  const setRepoName = (value: string) => {
+    repoFormData.name = value;
+  }
+
+  const setRepoDescription = (value: string) => {
+    repoFormData.description = value;
+  }
+
+  const saveRepository = () => {
+    if (repoFormData.name.trim() === '') {
+      alert('El nombre del repositorio es obligatorio');
+      return;
+    }
+    setLoading(true);
+    createRepository(repoFormData).then(() => {
+      history.push('/tab1');
+    }).catch(() => {
+      alert('Error al crear el repositorio');
+    }).finally(() => {
+      setLoading(false);
+    });
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -23,6 +59,8 @@ const Tab2: React.FC = () => {
             labelPlacement='floating'
             fill='outline'
             placeholder='nombre-repositorio'
+            value={repoFormData.name}
+            onIonChange={(e) => setRepoName(e.detail.value!)}
           ></IonInput>
           <IonTextarea
             className='form-field'
@@ -31,15 +69,17 @@ const Tab2: React.FC = () => {
             fill='outline'
             placeholder='Descripción del repositorio'
             rows={6}
+            value={repoFormData.description}
+            onIonChange={(e) => setRepoDescription(e.detail.value!)}
             autoGrow
           ></IonTextarea>
-          <IonButton className='form-field' expand='block' fill='solid'>Crear repositorio
-          </IonButton>
+          <IonButton className='form-field' expand='block' fill='solid'
+            onClick={saveRepository}>Crear repositorio</IonButton>
         </div>
-
+        {loading && <LoadingSpinner isOpen={loading} />}
       </IonContent>
     </IonPage>
   );
-};
 
+};
 export default Tab2;
