@@ -48,6 +48,24 @@ export const createRepository = async (repository: RepositoryPayload): Promise<R
         throw new Error( `${error as Error}.message`);
     }
 }
+ //actualizar repositorios
+export const updateRepository = async(owner: string, repo: string, data: Partial<RepositoryPayload>): Promise<Repository | null> =>{
+    try{
+        const response = await githubApiClient.patch(`/repos/${owner}/${repo}`, data);
+        return response.data as Repository;
+    }catch(error){
+        throw new Error( `${error as Error}.message`);
+    }
+}
+//eliminar repositorios
+export const deleteRepository= async(owner: string, repo: string): Promise<boolean> =>{
+    try{
+        const response = await githubApiClient.delete(`/repos/${owner}/${repo}`);
+        return true;
+    }catch (error){
+        throw new Error( `${error as Error}.message`);
+    }
+}
 
 export const getUserInfo = async () : Promise <GithubUser | null> => {
     try {

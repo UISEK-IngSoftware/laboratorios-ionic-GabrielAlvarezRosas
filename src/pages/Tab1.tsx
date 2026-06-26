@@ -39,7 +39,7 @@ const Tab1: React.FC = () => {
         </IonHeader>
         <IonList>
           {repos.map(repo => (
-            <RepoItem key={repo.id} {...repo} />
+            <RepoItem key={repo.id} {...repo} loadRepos={loadRepos} />
           ))}
         </IonList>
         {loading && <LoadingSpinner isOpen={loading} />}

@@ -5,16 +5,22 @@ import { RepositoryPayload } from '../interfaces/RepositoryPayload';
 import { createRepository } from '../services/GithubService';
 import React from 'react';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useLocation } from 'react-router-dom';
+import { updateRepository } from '../services/GithubService';
+import { Repository } from '../interfaces/Repository';
 
 const Tab2: React.FC = () => {
   const history = useHistory();
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string>("");
-
+  //constantespara editar
+  const location = useLocation<{ repository?: Repository }>();
+  const repository = location.state?.repository;
 
   const repoFormData: RepositoryPayload = {
-    name: '',
-    description: '',
+    //adaptamos el repoFormData para que según el origen nos muestre el dato o vacio
+    name: repository?.name || '',
+    description: repository?.description || ''
   };
 
   const setRepoName = (value: string) => {
@@ -31,7 +37,16 @@ const Tab2: React.FC = () => {
       return;
     }
     setLoading(true);
-    createRepository(repoFormData).then(() => {
+    //se agrega la acción de editar
+    const action = repository
+    ?updateRepository(
+      repository.owner.login,
+      repository.name,
+      repoFormData
+    )
+    :
+    createRepository(repoFormData);
+    action.then(() => {
       history.push('/tab1');
     }).catch((error) => {
       setErrorMsg('Error al crear el repositorio' + error);
@@ -79,7 +94,8 @@ const Tab2: React.FC = () => {
           ></IonTextarea>
           {errorMsg !== "" && <IonText color="danger">{errorMsg}</IonText>}
           <IonButton className='form-field' expand='block' fill='solid'
-            onClick={saveRepository}>Crear repositorio</IonButton>
+          //se modifica el boton para que sea dinamico a la acción
+            onClick={saveRepository}>{repository ? "Actualizar repositorio" : "Crear repositorio"}</IonButton>
         </div>
         {loading && <LoadingSpinner isOpen={loading} />}
       </IonContent>
